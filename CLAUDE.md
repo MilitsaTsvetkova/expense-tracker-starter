@@ -15,13 +15,30 @@ No test suite exists in this project.
 
 ## Architecture
 
-This is a single-file React app (Vite). All logic lives in `src/App.jsx` — there are no sub-components, no routing, and no external state management. `src/App.css` holds all styles.
+React + Vite SPA. All styles live in `src/App.css`. No routing, no external state management.
 
-State managed in `App`:
-- `transactions` — array of `{ id, description, amount, type, category, date }`
-- Form fields: `description`, `amount`, `type`, `category`
-- Filter fields: `filterType`, `filterCategory`
+### Component tree
 
-`amount` is stored as a **string** throughout (from the seeded data and from the `<input type="number">`). The `totalIncome`/`totalExpenses` reducers do not parse it, which causes string concatenation instead of numeric addition — this is the intentional bug in the starter project.
+```
+App
+├── Summary          — receives transactions, derives totalIncome/totalExpenses/balance internally
+├── TransactionForm  — owns its own form state; calls onAdd(transaction) prop on submit
+└── TransactionList  — owns its own filter state; receives transactions prop
+```
 
-The seeded transaction "Freelance Work" (id 4) is also miscategorized as `type: "expense"` when it should be `"income"`.
+**`App`** holds the single shared piece of state — the `transactions` array — and passes it down. It exposes a `handleAdd` callback to `TransactionForm` which appends the new transaction.
+
+**`TransactionForm`** manages `description`, `amount`, `type`, and `category` locally. On submit it calls `onAdd` with a fully-formed transaction object (`amount` parsed to a float via `parseFloat`).
+
+**`TransactionList`** manages `filterType` and `filterCategory` locally and derives the filtered view from the `transactions` prop on each render.
+
+### Data shape
+
+```js
+{ id, description, amount, type, category, date }
+// amount is always a number
+// type is "income" | "expense"
+// category is one of: food, housing, utilities, transport, entertainment, salary, other
+```
+
+The seeded transaction "Freelance Work" (id 4) is intentionally miscategorized as `type: "expense"` — this is a known bug from the starter project.
