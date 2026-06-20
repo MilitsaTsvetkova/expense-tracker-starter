@@ -1,5 +1,4 @@
-const fmt = (n) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+import { formatCurrency } from './utils';
 
 function Summary({ transactions }) {
   const totalIncome = transactions
@@ -17,15 +16,15 @@ function Summary({ transactions }) {
   return (
     <div className="summary">
       <span className="balance-label">Current Balance</span>
-      <p className={`balance-hero-amount ${balanceClass}`}>{fmt(balance)}</p>
+      <p className={`balance-hero-amount ${balanceClass}`}>{formatCurrency(balance)}</p>
       <div className="summary-stats">
         <div className="stat">
           <span className="stat-label">Income</span>
-          <span className="stat-amount income">{fmt(totalIncome)}</span>
+          <span className="stat-amount income">{formatCurrency(totalIncome)}</span>
         </div>
         <div className="stat">
           <span className="stat-label">Expenses</span>
-          <span className="stat-amount expense">{fmt(totalExpenses)}</span>
+          <span className="stat-amount expense">{formatCurrency(totalExpenses)}</span>
         </div>
       </div>
     </div>

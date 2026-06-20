@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import './App.css'
 import Summary from './Summary'
 import TransactionForm from './TransactionForm'
 import TransactionList from './TransactionList'
 import SpendingChart from './SpendingChart'
+
+const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
 function App() {
   const [transactions, setTransactions] = useState([
@@ -17,15 +19,13 @@ function App() {
     { id: 8, description: "Netflix", amount: 15, type: "expense", category: "entertainment", date: "2025-01-10" },
   ]);
 
-  const handleAdd = (transaction) => {
+  const handleAdd = useCallback((transaction) => {
     setTransactions(prev => [...prev, transaction]);
-  };
+  }, []);
 
-  const handleDelete = (id) => {
+  const handleDelete = useCallback((id) => {
     setTransactions(prev => prev.filter(t => t.id !== id));
-  };
-
-  const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }, []);
 
   return (
     <div className="app">

@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const categories = ['food', 'housing', 'utilities', 'transport', 'entertainment', 'salary', 'other'];
+import { CATEGORIES, capitalize } from './utils';
 
 function TransactionForm({ onAdd }) {
   const [description, setDescription] = useState('');
@@ -14,7 +13,7 @@ function TransactionForm({ onAdd }) {
     if (!description.trim() || !parsedAmount || parsedAmount <= 0) return;
 
     onAdd({
-      id: Date.now(),
+      id: crypto.randomUUID(),
       description: description.trim(),
       amount: parsedAmount,
       type,
@@ -64,10 +63,8 @@ function TransactionForm({ onAdd }) {
         <div className="form-field">
           <label htmlFor="tx-category">Category</label>
           <select id="tx-category" value={category} onChange={(e) => setCategory(e.target.value)}>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
+            {CATEGORIES.map(cat => (
+              <option key={cat} value={cat}>{capitalize(cat)}</option>
             ))}
           </select>
         </div>

@@ -1,14 +1,5 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-const COLORS = {
-  food: '#f97316',
-  housing: '#8b5cf6',
-  utilities: '#3b82f6',
-  transport: '#10b981',
-  entertainment: '#ec4899',
-  salary: '#6b7280',
-  other: '#eab308',
-};
+import { CATEGORY_COLORS, formatCurrency, capitalize } from './utils';
 
 function SpendingChart({ transactions }) {
   const expensesByCategory = transactions
@@ -19,7 +10,7 @@ function SpendingChart({ transactions }) {
     }, {});
 
   const data = Object.entries(expensesByCategory).map(([category, amount]) => ({
-    name: category.charAt(0).toUpperCase() + category.slice(1),
+    name: capitalize(category),
     value: amount,
     category,
   }));
@@ -29,7 +20,7 @@ function SpendingChart({ transactions }) {
   }
 
   return (
-    <div className="spending-chart">
+    <div className="spending-chart" role="img" aria-label="Pie chart of spending by category">
       <h2>Spending by Category</h2>
       <ResponsiveContainer width="100%" height={280}>
         <PieChart>
@@ -44,10 +35,10 @@ function SpendingChart({ transactions }) {
             labelLine={false}
           >
             {data.map((entry) => (
-              <Cell key={entry.category} fill={COLORS[entry.category] || '#94a3b8'} />
+              <Cell key={entry.category} fill={CATEGORY_COLORS[entry.category] || '#94a3b8'} />
             ))}
           </Pie>
-          <Tooltip formatter={(value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)} />
+          <Tooltip formatter={(value) => formatCurrency(value)} />
           <Legend />
         </PieChart>
       </ResponsiveContainer>

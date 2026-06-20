@@ -1,48 +1,42 @@
 import { useState } from 'react'
-
-const categories = ['food', 'housing', 'utilities', 'transport', 'entertainment', 'salary', 'other'];
-
-const CAT_COLORS = {
-  food: '#f97316',
-  housing: '#8b5cf6',
-  utilities: '#3b82f6',
-  transport: '#10b981',
-  entertainment: '#ec4899',
-  salary: '#6b7280',
-  other: '#eab308',
-};
+import { CATEGORIES, CATEGORY_COLORS, formatCurrency, capitalize } from './utils';
 
 const formatDate = (dateStr) => {
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
-const fmt = (n) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
-
 function TransactionList({ transactions, onDelete }) {
   const [filterType, setFilterType] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  let filtered = transactions;
-  if (filterType !== 'all') filtered = filtered.filter(t => t.type === filterType);
-  if (filterCategory !== 'all') filtered = filtered.filter(t => t.category === filterCategory);
+  const filtered = transactions.filter(t =>
+    (filterType === 'all' || t.type === filterType) &&
+    (filterCategory === 'all' || t.category === filterCategory)
+  );
 
   return (
     <div className="transactions">
       <h2>Transactions</h2>
       <div className="filters">
-        <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+        <select
+          aria-label="Filter by type"
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+        >
           <option value="all">All Types</option>
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
-        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+        <select
+          aria-label="Filter by category"
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+        >
           <option value="all">All Categories</option>
-          {categories.map(cat => (
-            <option key={cat} value={cat}>
-              {cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </option>
+          {CATEGORIES.map(cat => (
+            <option key={cat} value={cat}>{capitalize(cat)}</option>
           ))}
         </select>
       </div>
@@ -57,7 +51,7 @@ function TransactionList({ transactions, onDelete }) {
               <th>Description</th>
               <th>Category</th>
               <th className="th-amount">Amount</th>
-              <th></th>
+              <th><span className="sr-only">Actions</span></th>
             </tr>
           </thead>
           <tbody>
@@ -69,21 +63,23 @@ function TransactionList({ transactions, onDelete }) {
                   <span className="cat-badge">
                     <span
                       className="cat-dot"
-                      style={{ background: CAT_COLORS[t.category] || '#94a3b8' }}
+                      style={{ background: CATEGORY_COLORS[t.category] || '#94a3b8' }}
                     />
-                    {t.category.charAt(0).toUpperCase() + t.category.slice(1)}
+                    {capitalize(t.category)}
                   </span>
                 </td>
                 <td className={`td-amount ${t.type === 'income' ? 'income-amount' : 'expense-amount'}`}>
-                  {t.type === 'income' ? '+' : '−'}{fmt(t.amount)}
+                  {t.type === 'income' ? '+' : '−'}{formatCurrency(t.amount)}
                 </td>
                 <td>
-                  <button
-                    className="delete-btn"
-                    onClick={() => { if (window.confirm('Delete this transaction?')) onDelete(t.id); }}
-                  >
-                    Delete
-                  </button>
+                  {pendingDeleteId === t.id ? (
+                    <>
+                      <button className="delete-btn" onClick={() => { onDelete(t.id); setPendingDeleteId(null); }}>Confirm</button>
+                      <button onClick={() => setPendingDeleteId(null)}>Cancel</button>
+                    </>
+                  ) : (
+                    <button className="delete-btn" onClick={() => setPendingDeleteId(t.id)}>Delete</button>
+                  )}
                 </td>
               </tr>
             ))}
