@@ -47,7 +47,7 @@ function SpendingChart({ transactions }) {
               <Cell key={entry.category} fill={COLORS[entry.category] || '#94a3b8'} />
             ))}
           </Pie>
-          <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+          <Tooltip formatter={(value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)} />
           <Legend />
         </PieChart>
       </ResponsiveContainer>
